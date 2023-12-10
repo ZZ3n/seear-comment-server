@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    hostname: comment-app
+    ports:
+      - "8080:8080"
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: mydb
+    healthcheck:
+      test: [ "CMD", "mysqladmin","ping","-h","localhost","-u","root","-p$$MYSQL_ROOT_PASSWORD" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    hostname: comment-db
